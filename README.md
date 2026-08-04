@@ -122,8 +122,9 @@ scenario.
 
 ## AI Agent Logs
 See `/ai-logs` — one export per chat session:
-- `01-contract-and-scaffold.md` — shared types, API client, project scaffold
-- `02-search-page.md` — worktree agent, search and results
-- `03-train-detail-booking.md` — worktree agent, details and booking
-- `04-integration-review.md` — cross-check after merging both tracks
+- `01_cursor_chat_next_js_project_skeleton_plan.json` — Next.js project skeleton, plan
+- `02-1_cursor_chat_ui_updates_and_error_handling.json` — UI updates and error handling
+- `02-2_cursor_chat_ui_form_implementation_plan.json` — search form implementation plan
+- `03_cursor_chat_saved_trains_feature_implementat.json` — Saved trains feature implementation
+- `04_cursor_chat_readme_md_update_details.json` — README.md update
 - (add more as new sessions happen)

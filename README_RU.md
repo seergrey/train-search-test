@@ -117,8 +117,9 @@ curl -X POST https://train-booking-assignment.onrender.com/reset
 
 ## AI Agent Logs
 См. `/ai-logs` — один экспорт на чат-сессию:
-- `01-contract-and-scaffold.md` — общие типы, API-клиент, скелет проекта
-- `02-search-page.md` — worktree-агент, поиск и результаты
-- `03-train-detail-booking.md` — worktree-агент, детали и бронирование
-- `04-integration-review.md` — сверка после мерджа обоих треков
+- `01_cursor_chat_next_js_project_skeleton_plan.json` — план и скелет Next.js-проекта
+- `02-1_cursor_chat_ui_updates_and_error_handling.json` — правки UI и обработка ошибок
+- `02-2_cursor_chat_ui_form_implementation_plan.json` — план реализации формы поиска
+- `03_cursor_chat_saved_trains_feature_implementat.json` — реализация Saved trains
+- `04_cursor_chat_readme_md_update_details.json` — обновление README.md
 - (добавляй по мере новых сессий)
