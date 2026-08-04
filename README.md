@@ -19,7 +19,7 @@ _(держи актуальным по ходу работы, не только 
 
 - [x] Слой данных: типы по факту API, `lib/api.ts` с `Result<T>`/`ApiError`,
       URL-контракт поиска в `lib/search-params.ts`, smoke-прогон контрактов
-- [ ] Search page (from/to/date/budget в URL, SSR-результаты, сортировка по цене)
+- [x] Search page (from/to/date/budget в URL, SSR-результаты, сортировка по цене)
 - [ ] Детали поезда + бронирование (обработка 404/409/400)
 - [ ] Saved trains (localStorage, закреплены наверху списка)
 - [ ] Loading/error/empty состояния во всех вьюхах с данными
