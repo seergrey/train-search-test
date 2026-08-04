@@ -115,7 +115,11 @@ function BookingErrorBanner({
   // 409: expected business outcome, not a system error — inline recovery, no redirect.
   if (error.kind === 'conflict') {
     return (
-      <div role="alert" className="space-y-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+      <div
+        role="alert"
+        aria-live="polite"
+        className="space-y-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+      >
         <p>{error.message}</p>
         <div className="flex flex-wrap gap-2">
           <Link href={backHref} className="rounded-md bg-amber-600 px-3 py-1.5 font-medium text-white">
@@ -135,7 +139,11 @@ function BookingErrorBanner({
 
   if (error.kind === 'not_found') {
     return (
-      <div role="alert" className="space-y-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+      <div
+        role="alert"
+        aria-live="polite"
+        className="space-y-3 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900"
+      >
         <p>{error.message}</p>
         <Link href={backHref} className="inline-block rounded-md bg-red-600 px-3 py-1.5 font-medium text-white">
           Back to results
@@ -147,14 +155,22 @@ function BookingErrorBanner({
   // 400: a general validation failure — no field-level detail from the API to surface.
   if (error.kind === 'validation') {
     return (
-      <div role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+      <div
+        role="alert"
+        aria-live="polite"
+        className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900"
+      >
         Booking request was invalid. Please check the number of seats and try again.
       </div>
     );
   }
 
   return (
-    <div role="alert" className="space-y-2 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+    <div
+      role="alert"
+      aria-live="polite"
+      className="space-y-2 rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-900"
+    >
       <p>{error.message}</p>
       <button
         type="button"
@@ -169,7 +185,11 @@ function BookingErrorBanner({
 
 function SoldOut({ backHref }: { backHref: string }) {
   return (
-    <div className="mt-6 space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+    <div
+      role="status"
+      aria-live="polite"
+      className="mt-6 space-y-3 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+    >
       <p className="font-medium">No seats left on this train.</p>
       <Link href={backHref} className="inline-block rounded-md bg-amber-600 px-4 py-2 font-medium text-white">
         Back to results
@@ -188,7 +208,11 @@ function BookingConfirmation({
   onBookAgain: () => void;
 }) {
   return (
-    <div className="mt-6 space-y-3 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-900">
+    <div
+      role="status"
+      aria-live="polite"
+      className="mt-6 space-y-3 rounded-lg border border-green-300 bg-green-50 p-4 text-sm text-green-900"
+    >
       <p className="font-medium">
         Booked {booking.seats} seat{booking.seats === 1 ? '' : 's'}.
       </p>

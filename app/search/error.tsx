@@ -18,7 +18,7 @@ export default function SearchError({ error, retry }: SearchErrorProps) {
   }, [error]);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col items-start gap-3 px-4 py-10">
+    <main aria-live="polite" className="mx-auto flex max-w-3xl flex-col items-start gap-3 px-4 py-10">
       <h1 className="text-lg font-semibold text-slate-900">Something went wrong</h1>
       <p className="text-sm text-slate-600">
         The search page hit an unexpected error. This is separate from the train service being
