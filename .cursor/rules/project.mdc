@@ -1,0 +1,19 @@
+---
+description: Ambient conventions for the train-search test assignment
+globs:
+alwaysApply: true
+---
+
+- TypeScript strict, no `any`. Explicit types on public function signatures.
+- Data fetching only via `lib/api.ts` — never raw `fetch()` inside components.
+- Search state (`from`, `to`, `date`, `maxPrice`, `sortBy`, `sortOrder`) lives in the URL
+  query string, not only in local component state. Any change to search
+  updates the URL.
+- Every view that fetches data needs an explicit loading state AND an
+  explicit error state — the external API is deliberately slow/unreliable
+  for this assignment, never let it look like a broken page.
+- Booking 409 (not enough seats) is an expected business outcome, not a
+  system error — show inline recovery UI, don't redirect away destructively.
+- Mobile-first: ~60% of traffic is mobile per the brief. Design for a narrow
+  viewport first, then widen.
+- Don't add a new dependency without a one-line reason in chat first.
