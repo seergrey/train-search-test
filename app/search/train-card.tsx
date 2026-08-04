@@ -3,20 +3,23 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSavedTrains } from '@/lib/hooks/use-saved-trains';
-import type { Train } from '@/lib/types';
+import { serializeSearchQuery } from '@/lib/search-params';
+import type { SearchQuery, Train } from '@/lib/types';
 
 const LOW_SEATS_THRESHOLD = 5;
 
-export function TrainCard({ train }: { train: Train }) {
+export function TrainCard({ train, query }: { train: Train; query: SearchQuery }) {
   const { isSaved, toggle } = useSavedTrains();
   const soldOut = train.seatsLeft <= 0;
   const lowSeats = !soldOut && train.seatsLeft <= LOW_SEATS_THRESHOLD;
   const saved = isSaved(train.id);
+  // Carries the current search onto the detail page, so its "back to results" link can restore it.
+  const qs = serializeSearchQuery(query);
 
   return (
     <li className="flex items-center gap-1 rounded-xl border border-slate-200 pr-2 transition hover:border-slate-300 hover:shadow-sm">
       <Link
-        href={`/train/${encodeURIComponent(train.id)}`}
+        href={`/train/${encodeURIComponent(train.id)}${qs === '' ? '' : `?${qs}`}`}
         className="flex min-w-0 flex-1 items-center gap-4 p-3 sm:p-4"
       >
         <Image

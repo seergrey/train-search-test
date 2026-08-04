@@ -113,7 +113,7 @@ function Results({
       <p className="text-sm text-slate-500">
         {visibleTrains.length} train{visibleTrains.length === 1 ? '' : 's'} found
       </p>
-      <TrainList trains={visibleTrains} />
+      <TrainList trains={visibleTrains} query={query} />
     </>
   );
 }

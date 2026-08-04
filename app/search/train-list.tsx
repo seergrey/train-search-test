@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useSavedTrains } from '@/lib/hooks/use-saved-trains';
-import type { Train } from '@/lib/types';
+import type { SearchQuery, Train } from '@/lib/types';
 import { TrainCard } from './train-card';
 
 /**
@@ -13,7 +13,7 @@ import { TrainCard } from './train-card';
  * trains to the top — no layout jump because the pre-hydration render is
  * identical to the server's.
  */
-export function TrainList({ trains }: { trains: Train[] }) {
+export function TrainList({ trains, query }: { trains: Train[]; query: SearchQuery }) {
   const { savedIds } = useSavedTrains();
 
   const orderedTrains = useMemo(() => {
@@ -25,7 +25,7 @@ export function TrainList({ trains }: { trains: Train[] }) {
   return (
     <ul className="flex flex-col gap-3">
       {orderedTrains.map((train) => (
-        <TrainCard key={train.id} train={train} />
+        <TrainCard key={train.id} train={train} query={query} />
       ))}
     </ul>
   );
