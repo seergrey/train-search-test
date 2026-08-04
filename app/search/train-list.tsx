@@ -1,0 +1,32 @@
+'use client';
+
+import { useMemo } from 'react';
+import { useSavedTrains } from '@/lib/hooks/use-saved-trains';
+import type { Train } from '@/lib/types';
+import { TrainCard } from './train-card';
+
+/**
+ * Renders the fetched trains in the order the server sent them until the
+ * saved-trains hook loads (localStorage isn't available server-side, so
+ * `savedIds` starts empty and this matches the SSR markup exactly). Once
+ * the hook's effect populates `savedIds`, a single re-sort moves saved
+ * trains to the top — no layout jump because the pre-hydration render is
+ * identical to the server's.
+ */
+export function TrainList({ trains }: { trains: Train[] }) {
+  const { savedIds } = useSavedTrains();
+
+  const orderedTrains = useMemo(() => {
+    if (savedIds.length === 0) return trains;
+    const saved = new Set(savedIds);
+    return [...trains].sort((a, b) => Number(saved.has(b.id)) - Number(saved.has(a.id)));
+  }, [trains, savedIds]);
+
+  return (
+    <ul className="flex flex-col gap-3">
+      {orderedTrains.map((train) => (
+        <TrainCard key={train.id} train={train} />
+      ))}
+    </ul>
+  );
+}

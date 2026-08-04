@@ -1,18 +1,23 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSavedTrains } from '@/lib/hooks/use-saved-trains';
 import type { Train } from '@/lib/types';
 
 const LOW_SEATS_THRESHOLD = 5;
 
 export function TrainCard({ train }: { train: Train }) {
+  const { isSaved, toggle } = useSavedTrains();
   const soldOut = train.seatsLeft <= 0;
   const lowSeats = !soldOut && train.seatsLeft <= LOW_SEATS_THRESHOLD;
+  const saved = isSaved(train.id);
 
   return (
-    <li className="rounded-xl border border-slate-200 transition hover:border-slate-300 hover:shadow-sm">
+    <li className="flex items-center gap-1 rounded-xl border border-slate-200 pr-2 transition hover:border-slate-300 hover:shadow-sm">
       <Link
         href={`/train/${encodeURIComponent(train.id)}`}
-        className="flex items-center gap-4 p-3 sm:p-4"
+        className="flex min-w-0 flex-1 items-center gap-4 p-3 sm:p-4"
       >
         <Image
           src={train.image}
@@ -26,6 +31,7 @@ export function TrainCard({ train }: { train: Train }) {
           <div className="flex items-baseline gap-2 text-sm text-slate-500">
             <span className="font-medium text-slate-900">{train.trainNumber}</span>
             <span>{train.carriageClass}</span>
+            {saved ? <SavedBadge /> : null}
           </div>
           <div className="mt-1 flex items-center gap-2 text-base font-semibold text-slate-900 sm:text-lg">
             <span>{train.departureTime}</span>
@@ -47,7 +53,26 @@ export function TrainCard({ train }: { train: Train }) {
           <SeatsBadge soldOut={soldOut} lowSeats={lowSeats} seatsLeft={train.seatsLeft} />
         </div>
       </Link>
+
+      <button
+        type="button"
+        onClick={() => toggle(train.id)}
+        aria-pressed={saved}
+        aria-label={saved ? 'Remove from saved trains' : 'Save train'}
+        title={saved ? 'Remove from saved' : 'Save'}
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg text-slate-300 transition hover:bg-rose-50 hover:text-rose-500"
+      >
+        <span aria-hidden="true">{saved ? '♥' : '♡'}</span>
+      </button>
     </li>
+  );
+}
+
+function SavedBadge() {
+  return (
+    <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-600">
+      Saved
+    </span>
   );
 }
 

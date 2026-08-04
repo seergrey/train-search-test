@@ -12,7 +12,7 @@ import {
 import type { Result, SearchQuery, TrainsPage } from '@/lib/types';
 import { RetryButton } from './retry-button';
 import { SearchForm } from './search-form';
-import { TrainCard } from './train-card';
+import { TrainList } from './train-list';
 
 interface SearchPageProps {
   searchParams: Promise<RawSearchParams>;
@@ -113,11 +113,7 @@ function Results({
       <p className="text-sm text-slate-500">
         {visibleTrains.length} train{visibleTrains.length === 1 ? '' : 's'} found
       </p>
-      <ul className="flex flex-col gap-3">
-        {visibleTrains.map((train) => (
-          <TrainCard key={train.id} train={train} />
-        ))}
-      </ul>
+      <TrainList trains={visibleTrains} />
     </>
   );
 }
