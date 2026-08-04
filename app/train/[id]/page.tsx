@@ -39,7 +39,7 @@ export default async function TrainPage({ params, searchParams }: TrainPageProps
 function BackLink({ href }: { href: string }) {
   return (
     <Link href={href} className="inline-flex items-center gap-1 text-sm font-medium text-blue-600">
-      ← Back to results
+      <span aria-hidden="true">←</span> Back to results
     </Link>
   );
 }
@@ -106,7 +106,10 @@ function SeatsBadge({ seatsLeft, totalSeats }: { seatsLeft: number; totalSeats: 
 
 function TrainNotFound({ backHref }: { backHref: string }) {
   return (
-    <main className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center">
+    <main
+      aria-live="polite"
+      className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center"
+    >
       <h1 className="text-lg font-semibold text-slate-900">Train not found</h1>
       <p className="text-sm text-slate-600">This train doesn&apos;t exist or may have been removed.</p>
       <Link href={backHref} className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white">
@@ -118,7 +121,10 @@ function TrainNotFound({ backHref }: { backHref: string }) {
 
 function TrainLoadError({ backHref, message }: { backHref: string; message: string }) {
   return (
-    <main className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center">
+    <main
+      aria-live="polite"
+      className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center"
+    >
       <h1 className="text-lg font-semibold text-slate-900">Couldn&apos;t load this train</h1>
       <p className="text-sm text-slate-600">{message}</p>
       <div className="flex gap-2">

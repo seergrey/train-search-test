@@ -8,7 +8,10 @@ import Link from 'next/link';
  */
 export default function TrainError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
-    <main className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center">
+    <main
+      aria-live="polite"
+      className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center"
+    >
       <h1 className="text-lg font-semibold text-slate-900">Something went wrong</h1>
       <p className="text-sm text-slate-600">The train service is having trouble right now.</p>
       <div className="flex gap-2">

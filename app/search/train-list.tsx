@@ -23,7 +23,7 @@ export function TrainList({ trains }: { trains: Train[] }) {
   }, [trains, savedIds]);
 
   return (
-    <ul className="flex flex-col gap-3">
+    <ul role="list" aria-label="Train results" className="flex flex-col gap-3">
       {orderedTrains.map((train) => (
         <TrainCard key={train.id} train={train} />
       ))}

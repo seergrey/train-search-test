@@ -14,7 +14,10 @@ export function TrainCard({ train }: { train: Train }) {
   const saved = isSaved(train.id);
 
   return (
-    <li className="flex items-center gap-1 rounded-xl border border-slate-200 pr-2 transition hover:border-slate-300 hover:shadow-sm">
+    <li
+      role="listitem"
+      className="flex items-center gap-1 rounded-xl border border-slate-200 pr-2 transition hover:border-slate-300 hover:shadow-sm"
+    >
       <Link
         href={`/train/${encodeURIComponent(train.id)}`}
         className="flex min-w-0 flex-1 items-center gap-4 p-3 sm:p-4"
@@ -58,7 +61,11 @@ export function TrainCard({ train }: { train: Train }) {
         type="button"
         onClick={() => toggle(train.id)}
         aria-pressed={saved}
-        aria-label={saved ? 'Remove from saved trains' : 'Save train'}
+        aria-label={
+          saved
+            ? `Remove train ${train.trainNumber} from saved trains`
+            : `Save train ${train.trainNumber}`
+        }
         title={saved ? 'Remove from saved' : 'Save'}
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg text-slate-300 transition hover:bg-rose-50 hover:text-rose-500"
       >

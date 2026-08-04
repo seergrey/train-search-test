@@ -67,10 +67,21 @@ export function SearchForm({ stations, stationsError, initialQuery }: SearchForm
     router.push(searchHref(DEFAULT_SEARCH_QUERY));
   }
 
+  const cityErrorId = `${formId}-city-error`;
+
   return (
-    <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 p-4">
+    <form
+      onSubmit={handleSubmit}
+      role="search"
+      aria-label="Train search"
+      className="rounded-xl border border-slate-200 p-4"
+    >
       {stationsError !== null ? (
-        <p className="mb-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        <p
+          role="status"
+          aria-live="polite"
+          className="mb-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800"
+        >
           Couldn&apos;t load the city list ({stationsError}). Type a city name below instead.
         </p>
       ) : null}
@@ -84,6 +95,8 @@ export function SearchForm({ stations, stationsError, initialQuery }: SearchForm
             value={from}
             onChange={setFrom}
             placeholder="Any city"
+            invalid={sameCity}
+            describedBy={sameCity ? cityErrorId : undefined}
           />
         </Field>
 
@@ -96,16 +109,18 @@ export function SearchForm({ stations, stationsError, initialQuery }: SearchForm
               value={to}
               onChange={setTo}
               placeholder="Any city"
+              invalid={sameCity}
+              describedBy={sameCity ? cityErrorId : undefined}
             />
           </Field>
           <button
             type="button"
             onClick={handleSwap}
-            aria-label="Swap cities"
+            aria-label="Swap departure and arrival cities"
             title="Swap cities"
             className="absolute -top-3 -right-1 hidden h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-xs text-slate-500 hover:bg-slate-50 sm:flex"
           >
-            ⇄
+            <span aria-hidden="true">⇄</span>
           </button>
         </div>
 
@@ -152,7 +167,9 @@ export function SearchForm({ stations, stationsError, initialQuery }: SearchForm
       </div>
 
       {sameCity ? (
-        <p className="mt-3 text-xs text-red-600">Departure and arrival cities must differ.</p>
+        <p id={cityErrorId} role="alert" aria-live="polite" className="mt-3 text-xs text-red-600">
+          Departure and arrival cities must differ.
+        </p>
       ) : null}
 
       <div className="mt-4 flex items-center gap-3">
@@ -203,6 +220,8 @@ function CityInput({
   value,
   onChange,
   placeholder,
+  invalid,
+  describedBy,
 }: {
   id: string;
   stations: Station[];
@@ -210,6 +229,8 @@ function CityInput({
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
+  invalid?: boolean;
+  describedBy?: string;
 }) {
   if (useFallback) {
     return (
@@ -219,6 +240,8 @@ function CityInput({
         value={value}
         onChange={(event) => onChange(event.target.value.trim().toLowerCase())}
         placeholder="e.g. berlin"
+        aria-invalid={invalid ?? undefined}
+        aria-describedby={describedBy}
         className="h-10 w-full rounded-md border border-slate-300 px-2 text-sm"
       />
     );
@@ -229,6 +252,8 @@ function CityInput({
       id={id}
       value={value}
       onChange={(event) => onChange(event.target.value)}
+      aria-invalid={invalid ?? undefined}
+      aria-describedby={describedBy}
       className="h-10 w-full rounded-md border border-slate-300 bg-white px-2 text-sm"
     >
       <option value="">{placeholder}</option>
