@@ -10,9 +10,9 @@ import {
   type RawSearchParams,
 } from '@/lib/search-params';
 import type { Result, SearchQuery, TrainsPage } from '@/lib/types';
-import { RetryButton } from './RetryButton';
-import { SearchForm } from './SearchForm';
-import { TrainCard } from './TrainCard';
+import { RetryButton } from './retry-button';
+import { SearchForm } from './search-form';
+import { TrainCard } from './train-card';
 
 interface SearchPageProps {
   searchParams: Promise<RawSearchParams>;
