@@ -12,7 +12,9 @@ defaulting to the assignment's public test API, so `.env` isn't required.
 
 Also available: `npm run typecheck`, `npm run lint`,
 `npm run smoke` (runs every `lib/api.ts` wrapper against the live API,
-including 404/400/409; resets seats via `/reset` at the end).
+including 404/400/409; resets seats via `/reset` at the end),
+`npm run test` (Vitest unit tests for `lib/api.ts` and `lib/search-params.ts`,
+mocked with `msw`), `npm run e2e` (Playwright, see below).
 
 ## What was implemented
 _(kept up to date as work progresses, not only at the end)_
@@ -25,6 +27,9 @@ _(kept up to date as work progresses, not only at the end)_
 - [x] Saved trains (localStorage, pinned to the top of the list)
 - [x] Loading/error/empty states across every data-fetching view
 - [x] Mobile adaptation
+- [x] Tests: Vitest unit tests (`lib/api.test.ts`, `lib/search-params.test.ts`,
+      mocked via `msw`) and a Playwright e2e test
+      (`e2e/booking-conflict.spec.ts`) against the live API
 
 ## What was not implemented and why
 _(deliberate prioritization calls, not "ran out of time")_
@@ -43,10 +48,10 @@ _(deliberate prioritization calls, not "ran out of time")_
   either.
 - Autocomplete / debounce while typing cities — the form only submits on
   explicit submit (the "Search trains" button), no live search as you type.
-- A full test suite — only `scripts/smoke.ts` exists (contract checks for
-  `lib/api.ts` against the live API). No unit tests for `search-params.ts`,
-  the parsing in `api.ts`, or `useSavedTrains` — ran out of time, deliberately
-  prioritized the flow itself.
+- Full test coverage — unit tests cover `ApiError.kind` mapping in `lib/api.ts`
+  and URL parsing/validation in `lib/search-params.ts`, and an e2e test covers
+  the booking-conflict flow; `useSavedTrains` and the rest of the components
+  have no tests.
 - Animations / pixel-perfect design — explicitly out of scope for this
   assignment.
 
@@ -114,6 +119,15 @@ _(deliberate prioritization calls, not "ran out of time")_
   exported component/hook is named differently.
 
 ## Testing the booking-conflict flow
+`e2e/booking-conflict.spec.ts` (`npm run e2e`) runs against the live dev
+server and the real API, no mocks: it picks the scarcest train from
+`/trains`, opens its page, books out all remaining seats directly via
+`createBooking` to force a sold-out state, then submits the booking form
+and asserts the "no seats left on this train" message appears with a
+working "Back to results" link that restores the original from/to/date
+in the URL. It resets seats via `/reset` in `afterAll`.
+
+To trigger the same scenario manually:
 ```
 curl -X POST https://train-booking-assignment.onrender.com/reset
 ```
@@ -127,4 +141,9 @@ See `/ai-logs` — one export per chat session:
 - `02-2_cursor_chat_ui_form_implementation_plan.json` — search form implementation plan
 - `03_cursor_chat_saved_trains_feature_implementat.json` — Saved trains feature implementation
 - `04_cursor_chat_readme_md_update_details.json` — README.md update
+- `05-1_cursor_chat_testing_setup_for_lib_files.json` — Testing setup for lib files
+- `05-2_cursor_chat_accessibility_improvements_in_ap.json` — Accessibility improvements in app
+- `06_cursor_chat_playwright_e2e_test_setup.json` — Playwright e2e test setup
+- `07_cursor_chat_seat_count_discrepancy.json` — Seat count discrepancy
+- `08_cursor_chat_readme_md_update_request.json` — README.md update request
 - (add more as new sessions happen)

@@ -12,7 +12,9 @@ Base URL API берётся из `NEXT_PUBLIC_API_BASE_URL` (см. `.env.example
 
 Дополнительно: `npm run typecheck`, `npm run lint`,
 `npm run smoke` (прогон всех обёрток `lib/api.ts` по живому API, включая
-404/400/409; в конце сбрасывает места через `/reset`).
+404/400/409; в конце сбрасывает места через `/reset`), `npm run test`
+(юнит-тесты Vitest для `lib/api.ts` и `lib/search-params.ts`, моки через
+`msw`), `npm run e2e` (Playwright, см. ниже).
 
 ## What was implemented
 _(держи актуальным по ходу работы, не только в конце)_
@@ -24,6 +26,9 @@ _(держи актуальным по ходу работы, не только 
 - [x] Saved trains (localStorage, закреплены наверху списка)
 - [x] Loading/error/empty состояния во всех вьюхах с данными
 - [x] Мобильная адаптация
+- [x] Тесты: юнит-тесты Vitest (`lib/api.test.ts`, `lib/search-params.test.ts`,
+      моки через `msw`) и e2e-тест Playwright
+      (`e2e/booking-conflict.spec.ts`) по живому API
 
 ## What was not implemented and why
 _(осознанные решения по приоритизации, не "не успел")_
@@ -41,10 +46,10 @@ _(осознанные решения по приоритизации, не "н�
   требует только это; `/trains` и не поддерживает других `sortBy`.
 - Автодополнение / debounce при вводе городов — форма отправляется только
   по сабмиту (кнопка "Search trains"), без live-поиска по мере набора текста.
-- Полноценный набор тестов — есть только `scripts/smoke.ts` (контракты
-  `lib/api.ts` по живому API). Юнит-тестов на `search-params.ts`,
-  парсинг в `api.ts` или `useSavedTrains` нет — не хватило времени,
-  осознанно приоритизировал сам флоу.
+- Полное покрытие тестами — юнит-тесты покрывают маппинг `ApiError.kind` в
+  `lib/api.ts` и парсинг/валидацию URL в `lib/search-params.ts`, e2e-тест
+  покрывает флоу с конфликтом при бронировании; `useSavedTrains` и остальные
+  компоненты тестами не покрыты.
 - Анимации / pixel-perfect дизайн — явно вне ожиданий задания.
 
 ## Assumptions
@@ -110,6 +115,15 @@ _(осознанные решения по приоритизации, не "н�
   когда экспортируемый компонент/хук называется иначе.
 
 ## Testing the booking-conflict flow
+`e2e/booking-conflict.spec.ts` (`npm run e2e`) гоняется по живому dev-серверу
+и реальному API, без моков: находит поезд с наименьшим числом мест через
+`/trains`, открывает его страницу, сам выкупает все оставшиеся места напрямую
+через `createBooking`, чтобы получить состояние sold-out, затем сабмитит
+форму бронирования и проверяет, что появляется сообщение "no seats left on
+this train" и рабочая ссылка "Back to results", восстанавливающая исходные
+from/to/date в URL. В `afterAll` сбрасывает места через `/reset`.
+
+Чтобы воспроизвести тот же сценарий вручную:
 ```
 curl -X POST https://train-booking-assignment.onrender.com/reset
 ```
@@ -122,4 +136,9 @@ curl -X POST https://train-booking-assignment.onrender.com/reset
 - `02-2_cursor_chat_ui_form_implementation_plan.json` — план реализации формы поиска
 - `03_cursor_chat_saved_trains_feature_implementat.json` — реализация Saved trains
 - `04_cursor_chat_readme_md_update_details.json` — обновление README.md
+- `05-1_cursor_chat_testing_setup_for_lib_files.json` — настройка тестов для lib
+- `05-2_cursor_chat_accessibility_improvements_in_ap.json` — доступность (a11y) в app
+- `06_cursor_chat_playwright_e2e_test_setup.json` — настройка e2e-теста на Playwright
+- `07_cursor_chat_seat_count_discrepancy.json` — расхождение в количестве мест
+- `08_cursor_chat_readme_md_update_request.json` — запрос на обновление README.md
 - (добавляй по мере новых сессий)
