@@ -9,7 +9,9 @@ import type { ApiError, Booking } from '@/lib/types';
 
 interface BookingFormProps {
   trainId: string;
-  initialSeatsLeft: number;
+  seatsLeft: number;
+  /** Lifted to the parent so the summary card above stays in sync with post-booking counts. */
+  onSeatsLeftChange: (seatsLeft: number) => void;
   /** /search URL with the searchParams the user arrived with, for every "back to results" action. */
   backHref: string;
 }
@@ -23,8 +25,7 @@ type Status =
 /** No documented upper bound on `seats`; capped for a sane dropdown. */
 const MAX_SEATS_PER_BOOKING = 9;
 
-export function BookingForm({ trainId, initialSeatsLeft, backHref }: BookingFormProps) {
-  const [seatsLeft, setSeatsLeft] = useState(initialSeatsLeft);
+export function BookingForm({ trainId, seatsLeft, onSeatsLeftChange, backHref }: BookingFormProps) {
   const [seats, setSeats] = useState(1);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
@@ -53,13 +54,13 @@ export function BookingForm({ trainId, initialSeatsLeft, backHref }: BookingForm
 
     if (result.ok) {
       setStatus({ kind: 'success', booking: result.data });
-      setSeatsLeft(result.data.seatsLeft);
+      onSeatsLeftChange(result.data.seatsLeft);
       return;
     }
 
     if (result.error.kind === 'conflict') {
       // The list page's seatsLeft was stale; reflect the API's current truth.
-      setSeatsLeft(0);
+      onSeatsLeftChange(0);
     }
     setStatus({ kind: 'error', error: result.error });
   }
