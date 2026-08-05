@@ -4,14 +4,12 @@ import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { createBooking } from '@/lib/api';
 import type { ApiError, Booking } from '@/lib/types';
+import { useSeatsLeft } from './seats-left-context';
 
 /** Booking step of the brief's main flow: pick a seat count, POST /bookings, handle 201/400/409. */
 
 interface BookingFormProps {
   trainId: string;
-  seatsLeft: number;
-  /** Lifted to the parent so the summary card above stays in sync with post-booking counts. */
-  onSeatsLeftChange: (seatsLeft: number) => void;
   /** /search URL with the searchParams the user arrived with, for every "back to results" action. */
   backHref: string;
 }
@@ -25,7 +23,8 @@ type Status =
 /** No documented upper bound on `seats`; capped for a sane dropdown. */
 const MAX_SEATS_PER_BOOKING = 9;
 
-export function BookingForm({ trainId, seatsLeft, onSeatsLeftChange, backHref }: BookingFormProps) {
+export function BookingForm({ trainId, backHref }: BookingFormProps) {
+  const { seatsLeft, setSeatsLeft } = useSeatsLeft();
   const [seats, setSeats] = useState(1);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
@@ -54,13 +53,13 @@ export function BookingForm({ trainId, seatsLeft, onSeatsLeftChange, backHref }:
 
     if (result.ok) {
       setStatus({ kind: 'success', booking: result.data });
-      onSeatsLeftChange(result.data.seatsLeft);
+      setSeatsLeft(result.data.seatsLeft);
       return;
     }
 
     if (result.error.kind === 'conflict') {
       // The list page's seatsLeft was stale; reflect the API's current truth.
-      onSeatsLeftChange(0);
+      setSeatsLeft(0);
     }
     setStatus({ kind: 'error', error: result.error });
   }
