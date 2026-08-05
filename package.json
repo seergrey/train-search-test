@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "smoke": "tsx scripts/smoke.ts",
     "api:reset": "curl -X POST https://train-booking-assignment.onrender.com/reset",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "test": "vitest run"
   },
   "dependencies": {
     "next": "16.3.0",
@@ -25,8 +26,10 @@
     "@types/react-dom": "19.2.4",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.0",
+    "msw": "2.15.0",
     "tailwindcss": "4.3.3",
     "tsx": "4.23.5",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
   }
 }

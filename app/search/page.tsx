@@ -69,7 +69,7 @@ function Results({
 }) {
   if (!trainsResult.ok) {
     return (
-      <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4">
+      <div role="alert" aria-live="polite" className="rounded-xl border border-red-200 bg-red-50 p-4">
         <p className="text-sm font-medium text-red-800">Couldn&apos;t load trains</p>
         <p className="mt-1 text-sm text-red-700">{trainsResult.error.message}</p>
         <div className="mt-3">
@@ -128,7 +128,11 @@ function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-slate-300 p-6">
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-slate-300 p-6"
+    >
       <p className="text-sm font-medium text-slate-900">{title}</p>
       <p className="text-sm text-slate-500">{description}</p>
       {action}
