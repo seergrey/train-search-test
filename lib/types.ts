@@ -96,8 +96,10 @@ export interface SearchQuery {
   to: string;
   /** 'YYYY-MM-DD', or '' when unset. */
   date: string;
-  /** Applied client-side after the fetch; null means no budget cap. */
+  /** Applied client-side to the fetched page; null means no budget cap. */
   maxPrice: number | null;
   sortBy: SortKey;
   sortOrder: SortOrder;
+  /** 1-based results page. Any filter change resets it to 1. */
+  page: number;
 }

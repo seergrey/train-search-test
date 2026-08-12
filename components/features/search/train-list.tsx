@@ -5,6 +5,9 @@ import { useSavedTrains } from '@/lib/hooks/use-saved-trains';
 import type { SearchQuery, Train } from '@/lib/types';
 import { TrainCard } from './train-card';
 
+/** Saved trains float to the top of the current page only — sorting across
+ *  pages would need the whole result set, which the API pages for us. */
+
 /**
  * Renders the fetched trains in the order the server sent them until the
  * saved-trains hook loads (localStorage isn't available server-side, so

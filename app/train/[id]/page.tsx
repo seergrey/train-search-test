@@ -1,12 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { BookingForm, SeatsBadge, SeatsLeftProvider } from '@/components/features/train';
+import { Card, CenteredMessage, LinkButton, RetryButton } from '@/components/ui';
 import { getTrain } from '@/lib/api';
+import { formatPrice } from '@/lib/format';
 import { parseSearchQuery, searchHref, type RawSearchParams } from '@/lib/search-params';
 import type { Train } from '@/lib/types';
-import { BookingForm } from './booking-form';
-import { RetryButton } from './retry-button';
-import { SeatsBadge } from './seats-badge';
-import { SeatsLeftProvider } from './seats-left-context';
 
 interface TrainPageProps {
   params: Promise<{ id: string }>;
@@ -30,7 +29,7 @@ export default async function TrainPage({ params, searchParams }: TrainPageProps
   const train = result.data;
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
+    <main className="mx-auto max-w-detail px-4 py-6 sm:py-10">
       <BackLink href={backHref} />
       {/* Client boundary is just the seats count + form; the summary card below stays server-rendered. */}
       <SeatsLeftProvider initialSeatsLeft={train.seatsLeft}>
@@ -43,7 +42,7 @@ export default async function TrainPage({ params, searchParams }: TrainPageProps
 
 function BackLink({ href }: { href: string }) {
   return (
-    <Link href={href} className="inline-flex items-center gap-1 text-sm font-medium text-blue-600">
+    <Link href={href} className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
       <span aria-hidden="true">←</span> Back to results
     </Link>
   );
@@ -51,7 +50,7 @@ function BackLink({ href }: { href: string }) {
 
 function TrainSummary({ train }: { train: Train }) {
   return (
-    <article className="mt-4 overflow-hidden rounded-lg border border-slate-200">
+    <Card as="article" padded={false} className="mt-4 overflow-hidden">
       <div className="relative h-40 w-full sm:h-56">
         <Image
           src={train.image}
@@ -64,68 +63,54 @@ function TrainSummary({ train }: { train: Train }) {
       </div>
       <div className="space-y-3 p-4">
         <div className="flex items-baseline justify-between gap-2">
-          <h1 className="text-lg font-semibold text-slate-900">
+          <h1 className="text-lg font-semibold text-content">
             {train.from} → {train.to}
           </h1>
-          <span className="text-xl font-bold text-slate-900">€{train.price}</span>
+          <span className="text-xl font-bold text-content">{formatPrice(train.price)}</span>
         </div>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-content-muted">
           {train.trainNumber} · {train.carriageClass}
         </p>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <SummaryItem term="Date" detail={train.departureDate} />
           <div>
-            <dt className="text-slate-500">Date</dt>
-            <dd className="font-medium text-slate-900">{train.departureDate}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Seats</dt>
+            <dt className="text-content-muted">Seats</dt>
             <dd>
               <SeatsBadge totalSeats={train.totalSeats} />
             </dd>
           </div>
-          <div>
-            <dt className="text-slate-500">Departure</dt>
-            <dd className="font-medium text-slate-900">{train.departureTime}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Arrival</dt>
-            <dd className="font-medium text-slate-900">{train.arrivalTime}</dd>
-          </div>
+          <SummaryItem term="Departure" detail={train.departureTime} />
+          <SummaryItem term="Arrival" detail={train.arrivalTime} />
         </dl>
       </div>
-    </article>
+    </Card>
+  );
+}
+
+function SummaryItem({ term, detail }: { term: string; detail: string }) {
+  return (
+    <div>
+      <dt className="text-content-muted">{term}</dt>
+      <dd className="font-medium text-content">{detail}</dd>
+    </div>
   );
 }
 
 function TrainNotFound({ backHref }: { backHref: string }) {
   return (
-    <main
-      aria-live="polite"
-      className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center"
-    >
-      <h1 className="text-lg font-semibold text-slate-900">Train not found</h1>
-      <p className="text-sm text-slate-600">This train doesn&apos;t exist or may have been removed.</p>
-      <Link href={backHref} className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white">
-        Back to results
-      </Link>
-    </main>
+    <CenteredMessage title="Train not found" description="This train doesn't exist or may have been removed.">
+      <LinkButton href={backHref}>Back to results</LinkButton>
+    </CenteredMessage>
   );
 }
 
 function TrainLoadError({ backHref, message }: { backHref: string; message: string }) {
   return (
-    <main
-      aria-live="polite"
-      className="mx-auto flex max-w-md flex-col items-center gap-4 px-4 py-16 text-center"
-    >
-      <h1 className="text-lg font-semibold text-slate-900">Couldn&apos;t load this train</h1>
-      <p className="text-sm text-slate-600">{message}</p>
-      <div className="flex gap-2">
-        <RetryButton />
-        <Link href={backHref} className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700">
-          Back to results
-        </Link>
-      </div>
-    </main>
+    <CenteredMessage title="Couldn't load this train" description={message}>
+      <RetryButton />
+      <LinkButton href={backHref} variant="secondary">
+        Back to results
+      </LinkButton>
+    </CenteredMessage>
   );
 }

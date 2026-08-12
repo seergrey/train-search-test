@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Button, CenteredMessage } from '@/components/ui';
 
 /**
  * Safety net for uncaught exceptions only — lib/api.ts never throws for
@@ -9,28 +10,21 @@ import { useEffect } from 'react';
  */
 interface SearchErrorProps {
   error: Error & { digest?: string };
-  retry: () => void;
+  /** Next's own prop name — it re-renders the segment when called. */
+  reset: () => void;
 }
 
-export default function SearchError({ error, retry }: SearchErrorProps) {
+export default function SearchError({ error, reset }: SearchErrorProps) {
   useEffect(() => {
     console.error(error);
   }, [error]);
 
   return (
-    <main aria-live="polite" className="mx-auto flex max-w-3xl flex-col items-start gap-3 px-4 py-10">
-      <h1 className="text-lg font-semibold text-slate-900">Something went wrong</h1>
-      <p className="text-sm text-slate-600">
-        The search page hit an unexpected error. This is separate from the train service being
-        slow — please try again.
-      </p>
-      <button
-        type="button"
-        onClick={() => retry()}
-        className="inline-flex items-center rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-slate-700"
-      >
-        Try again
-      </button>
-    </main>
+    <CenteredMessage
+      title="Something went wrong"
+      description="The search page hit an unexpected error. This is separate from the train service being slow — please try again."
+    >
+      <Button onClick={() => reset()}>Try again</Button>
+    </CenteredMessage>
   );
 }

@@ -1,18 +1,20 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { SearchForm, TrainList } from '@/components/features/search';
+import { Alert, EmptyState, PageHeader, Pagination, RetryButton } from '@/components/ui';
 import { getStations, getTrains } from '@/lib/api';
+import { pluralize } from '@/lib/format';
 import {
   applyMaxPrice,
+  pageInfo,
   parseSearchQuery,
   searchHref,
   toTrainsQuery,
+  withFilters,
+  withPage,
   type RawSearchParams,
 } from '@/lib/search-params';
 import type { Result, SearchQuery, TrainsPage } from '@/lib/types';
-import { RetryButton } from './retry-button';
-import { SearchForm } from './search-form';
-import { TrainList } from './train-list';
 
 interface SearchPageProps {
   searchParams: Promise<RawSearchParams>;
@@ -37,15 +39,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   ]);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-6 sm:py-10">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
-          {describeRoute(query)}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Compare departures across Germany and book in a few taps.
-        </p>
-      </header>
+    <main className="mx-auto flex max-w-page flex-col gap-6 px-4 py-6 sm:py-10">
+      <PageHeader
+        title={describeRoute(query)}
+        description="Compare departures across Germany and book in a few taps."
+      />
 
       <SearchForm
         stations={stationsResult.ok ? stationsResult.data : []}
@@ -60,29 +58,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   );
 }
 
-function Results({
-  query,
-  trainsResult,
-}: {
-  query: SearchQuery;
-  trainsResult: Result<TrainsPage>;
-}) {
+function Results({ query, trainsResult }: { query: SearchQuery; trainsResult: Result<TrainsPage> }) {
   if (!trainsResult.ok) {
     return (
-      <div role="alert" aria-live="polite" className="rounded-xl border border-red-200 bg-red-50 p-4">
-        <p className="text-sm font-medium text-red-800">Couldn&apos;t load trains</p>
-        <p className="mt-1 text-sm text-red-700">{trainsResult.error.message}</p>
-        <div className="mt-3">
+      <Alert tone="danger" title="Couldn't load trains">
+        <p>{trainsResult.error.message}</p>
+        <div>
           <RetryButton />
         </div>
-      </div>
+      </Alert>
     );
   }
 
-  const fetchedTrains = trainsResult.data.data;
+  const resultsPage = trainsResult.data;
+  const fetchedTrains = resultsPage.data;
+  // maxPrice is a client-side filter over the page the API returned, so it can
+  // empty this page while later pages still hold matches — the copy says so.
   const visibleTrains = applyMaxPrice(fetchedTrains, query.maxPrice);
+  const info = pageInfo(resultsPage.total, resultsPage.page, resultsPage.limit);
 
-  if (fetchedTrains.length === 0) {
+  if (resultsPage.total === 0) {
     return (
       <EmptyState
         title="No trains found"
@@ -91,17 +86,18 @@ function Results({
     );
   }
 
-  if (visibleTrains.length === 0) {
+  // Out-of-range page number: the route has results, this page just isn't one of them.
+  if (fetchedTrains.length === 0) {
     return (
       <EmptyState
-        title={`No trains under €${query.maxPrice ?? 0}`}
-        description={`${fetchedTrains.length} train${fetchedTrains.length === 1 ? '' : 's'} found on this route, but none fit that budget.`}
+        title="No trains on this page"
+        description={`This search has ${info.pageCount} ${pluralize(info.pageCount, 'page')} of results.`}
         action={
           <Link
-            href={searchHref({ ...query, maxPrice: null })}
-            className="text-sm font-medium text-slate-900 underline underline-offset-2"
+            href={searchHref(withPage(query, 1))}
+            className="text-sm font-medium text-primary underline underline-offset-2"
           >
-            Clear budget filter
+            Back to the first page
           </Link>
         }
       />
@@ -110,34 +106,46 @@ function Results({
 
   return (
     <>
-      <p className="text-sm text-slate-500">
-        {visibleTrains.length} train{visibleTrains.length === 1 ? '' : 's'} found
-      </p>
-      <TrainList trains={visibleTrains} query={query} />
+      {visibleTrains.length === 0 ? (
+        <EmptyState
+          title={`No trains under €${query.maxPrice ?? 0} on this page`}
+          description={`${fetchedTrains.length} ${pluralize(fetchedTrains.length, 'train')} on page ${info.page}, but none fit that budget. Other pages may still have matches.`}
+          action={
+            <Link
+              href={searchHref(withFilters(query, { maxPrice: null }))}
+              className="text-sm font-medium text-primary underline underline-offset-2"
+            >
+              Clear budget filter
+            </Link>
+          }
+        />
+      ) : (
+        <>
+          <p className="text-sm text-content-muted">
+            {describeCount(visibleTrains.length, fetchedTrains.length, info.total, query.maxPrice)}
+          </p>
+          <TrainList trains={visibleTrains} query={query} />
+        </>
+      )}
+
+      <Pagination
+        page={info.page}
+        pageCount={info.pageCount}
+        hasPrevious={info.hasPrevious}
+        hasNext={info.hasNext}
+        hrefForPage={(target) => searchHref(withPage(query, target))}
+      />
     </>
   );
 }
 
-function EmptyState({
-  title,
-  description,
-  action,
-}: {
-  title: string;
-  description: string;
-  action?: ReactNode;
-}) {
-  return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-slate-300 p-6"
-    >
-      <p className="text-sm font-medium text-slate-900">{title}</p>
-      <p className="text-sm text-slate-500">{description}</p>
-      {action}
-    </div>
-  );
+/** States what's on screen *and* what the whole route holds, so the budget
+ *  filter's page-local scope is never mistaken for a total. */
+function describeCount(visible: number, fetched: number, total: number, maxPrice: number | null): string {
+  if (maxPrice !== null && visible < fetched) {
+    return `${visible} of ${fetched} on this page under €${maxPrice} · ${total} ${pluralize(total, 'train')} on this route`;
+  }
+  return `${visible} ${pluralize(visible, 'train')} shown · ${total} found`;
 }
 
 function describeRoute(query: SearchQuery): string {
